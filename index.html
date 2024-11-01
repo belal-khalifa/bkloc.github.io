@@ -43,10 +43,10 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const status = document.getElementById('status');
-            status.textContent = `Location updated: Latitude: ${latitude}, Longitude: ${longitude}`;
+            status.textContent = "Location updated."; // Only show status message
 
             // Send location to the backend
-            fetch("https://pyrite-abalone-texture.glitch.me/receive-location", { // replace with your backend URL
+            fetch("https://your-backend-url.com/receive-location", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
