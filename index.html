@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Location Continuously</title>
+</head>
+
+<body>
+    <h1>Share Your Location Continuously</h1>
+    <p>Please click the button below to share your location continuously.</p>
+    <button onclick="startTracking()">Start Location Tracking</button>
+    <button onclick="stopTracking()">Stop Location Tracking</button>
+    <p id="status"></p>
+
+    <script>
+        let watchId;
+
+        function startTracking() {
+            const status = document.getElementById('status');
+            if (navigator.geolocation) {
+                status.textContent = "Starting location tracking...";
+                watchId = navigator.geolocation.watchPosition(success, error, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 1000
+                });
+            } else {
+                status.textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function stopTracking() {
+            const status = document.getElementById('status');
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                status.textContent = "Location tracking stopped.";
+            }
+        }
+
+        function success(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const status = document.getElementById('status');
+            status.textContent = `Location updated: Latitude: ${latitude}, Longitude: ${longitude}`;
+
+            // Send location to the backend
+            fetch("https://pyrite-abalone-texture.glitch.me/receive-location", { // replace with your backend URL
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ latitude, longitude })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        status.textContent = "Failed to share updated location.";
+                    }
+                })
+                .catch(() => {
+                    status.textContent = "Network error. Could not send updated location.";
+                });
+        }
+
+        function error() {
+            document.getElementById('status').textContent = "Unable to retrieve location.";
+        }
+    </script>
+</body>
+
+</html>
